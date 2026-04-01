@@ -1,0 +1,12 @@
+# IntelliJ / Java
+.idea/
+*.iml
+out/
+*.class
+
+# OpenCode/Copilot session data
+.omc/
+
+# OS
+.DS_Store
+Thumbs.db
