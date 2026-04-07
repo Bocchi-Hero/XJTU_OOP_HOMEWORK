@@ -59,7 +59,7 @@ public class MorseCodeDecode {
     }
 
     public static void main(String[] args) throws FileNotFoundException {
-        Scanner sc = new Scanner(new File("decode/encode.txt"));
+        Scanner sc = new Scanner(new File("encode.txt"));
         String sentence = sc.nextLine();
         System.out.println(decodeMorse(sentence).toLowerCase());
     }
