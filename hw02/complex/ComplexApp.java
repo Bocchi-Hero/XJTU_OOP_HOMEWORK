@@ -9,7 +9,7 @@ public class ComplexApp {
         double real1 = sc.nextDouble();
         double imag1 = sc.nextDouble();
         Complex c1 = new Complex(real1, imag1);
-        System.out.print("Enter complex number 1 (real and imaginary part): ");
+        System.out.print("Enter complex number 2 (real and imaginary part): ");
         double real2 = sc.nextDouble();
         double imag2 = sc.nextDouble();
         Complex c2 = new Complex(real2, imag2);
