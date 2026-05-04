@@ -75,7 +75,9 @@ public class MyTime implements Shape {
 
     @Override
     public void draw(Graphics g) {
+        // 获取当前绘图区域的边界
         Rectangle board = g.getClipBounds();
+        // 根据边界取中心坐标以及半径
         int centerX = (int) board.getCenterX();
         int centerY = (int) board.getCenterY();
         int radius = (int) (Math.min(board.getWidth(), board.getHeight()) * 0.4);
@@ -88,11 +90,12 @@ public class MyTime implements Shape {
         g.drawString("9", (int) (centerX - 0.9 * radius), centerY);
 
         drawPointer(g, centerX, centerY, second * 6, (int) (0.85 * radius), Color.RED);
-        drawPointer(g, centerX, centerY, minute * 6, (int) (0.65 * radius), Color.BLUE);
+        drawPointer(g, centerX, centerY, minute * 6, (int) (0.65 * radius), Color.BLUE);    // 鉴于误差很小，并没有做出秒针对分针的影响
         drawPointer(g, centerX, centerY, (hour % 12 + minute / 60.0) * 30, (int) (0.5 * radius), Color.GREEN);
     }
 
     private void drawPointer(Graphics g, int x, int y, double angle, int len, Color color) {
+        // 根据时钟坐标与java默认坐标进行旋转转换
         double convertedAngle = Math.toRadians(angle - 90);
 
         int endX = (int) (x + len * Math.cos(convertedAngle));

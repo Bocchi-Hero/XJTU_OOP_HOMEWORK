@@ -18,6 +18,7 @@ public class DrawPanel extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
+		// 相当于重新给面板刷漆，防止旧画面残留造成残影
 		super.paintComponent(g);
 		if (shapes == null) return;
 

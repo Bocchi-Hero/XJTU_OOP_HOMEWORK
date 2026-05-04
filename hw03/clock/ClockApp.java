@@ -9,23 +9,26 @@ import java.time.LocalTime;
 
 public class ClockApp {
     public static void main(String[] args) {
+        // 创建窗口
         JFrame frame = new JFrame("My Clock");
 
-
+        // 取当前时间并根据当前时间创建myTimer对象
         LocalTime currentTime = LocalTime.now();
         int hour = currentTime.getHour();
         int minute = currentTime.getMinute();
         int second = currentTime.getSecond();
         MyTime myTimer = new MyTime(hour, minute, second);
 
+        // 将myTimer包装进数组中，方便对DrawPanel的传参
         Shape[] shapes = new Shape[] { myTimer };
         DrawPanel panel = new DrawPanel(shapes);
 
         frame.add(panel);
         frame.setSize(400, 400);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   // 确定关闭行为
+        frame.setVisible(true); // 使窗口显现
 
+        // 启用多线程驱动时钟
         Thread t = new Thread() {
             public void run() {
                 while (true) {
