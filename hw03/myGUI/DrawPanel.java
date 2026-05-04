@@ -9,6 +9,8 @@ public class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Shape[] shapes;
 
+	public DrawPanel() {}
+
 	public DrawPanel(Shape[] shapes) {
 		setBackground(Color.WHITE);
 		this.shapes = shapes;
