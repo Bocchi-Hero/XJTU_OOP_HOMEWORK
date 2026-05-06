@@ -3,9 +3,11 @@ package homework3.mygui;
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.io.Serial;
 
 public class DrawPanel extends JPanel {
 	// 手动管理版本
+	@Serial
 	private static final long serialVersionUID = 1L;
 	private Shape[] shapes;
 
