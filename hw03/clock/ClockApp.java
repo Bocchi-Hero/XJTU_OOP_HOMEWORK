@@ -1,7 +1,7 @@
 package homework3.clock;
 
-import homework3.myGUI.DrawPanel;
-import homework3.myGUI.Shape;
+import homework3.mygui.DrawPanel;
+import homework3.mygui.Shape;
 import homework3.time.MyTime;
 
 import javax.swing.*;

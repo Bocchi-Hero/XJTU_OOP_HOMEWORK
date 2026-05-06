@@ -1,6 +1,6 @@
 package homework3.time;
 
-import homework3.myGUI.Shape;
+import homework3.mygui.Shape;
 import java.awt.*;
 
 public class MyTime implements Shape {

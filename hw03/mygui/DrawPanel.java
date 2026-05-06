@@ -1,4 +1,4 @@
-package homework3.myGUI;
+package homework3.mygui;
 
 import javax.swing.JPanel;
 import java.awt.Color;

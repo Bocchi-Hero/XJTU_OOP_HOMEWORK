@@ -1,4 +1,4 @@
-package homework3.myGUI;
+package homework3.mygui;
 
 import java.awt.*;
 
