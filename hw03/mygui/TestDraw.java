@@ -2,11 +2,18 @@ package homework3.mygui;
 
 import java.awt.*;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import java.util.Random;
 
 public class TestDraw {
-	private static Random randomNumber = new Random();
+	private static final int PANEL_WIDTH = 400;
+	private static final int PANEL_HEIGHT = 300;
+	private static final Random randomNumber = new Random();
 	public static void main(String[] args) {
+		SwingUtilities.invokeLater(TestDraw::createAndShowGUI);
+	}
+
+	private static void createAndShowGUI() {
 		DrawPanel panel1 = new DrawPanel(generateLines());
 		DrawPanel panel2 = new DrawPanel(generateCircles());
 		DrawPanel panel3 = new DrawPanel(generateRectangles());
@@ -18,16 +25,16 @@ public class TestDraw {
 		application.add(panel1);
 		application.add(panel2);
 		application.add(panel3);
-		application.setSize(400, 300);
+		application.setSize(PANEL_WIDTH * 3, PANEL_HEIGHT);
 		application.setVisible(true);
 	}
 	public static MyLine[] generateLines(){
 		MyLine[] lines = new MyLine[10 + randomNumber.nextInt(5)];
 		for (int count = 0; count < lines.length; count++) {
-			int x1 = randomNumber.nextInt(400);
-			int y1 = randomNumber.nextInt(300);
-			int x2 = randomNumber.nextInt(400);
-			int y2 = randomNumber.nextInt(300);
+			int x1 = randomNumber.nextInt(PANEL_WIDTH);
+			int y1 = randomNumber.nextInt(PANEL_HEIGHT);
+			int x2 = randomNumber.nextInt(PANEL_WIDTH);
+			int y2 = randomNumber.nextInt(PANEL_HEIGHT);
 			Color color = new Color(randomNumber.nextInt(256), randomNumber.nextInt(256),
 					randomNumber.nextInt(256));
 			lines[count] = new MyLine(x1, y1, x2, y2, color);
@@ -39,9 +46,9 @@ public class TestDraw {
 		//函数将返回MyCircle类型的数组，该数组可以作为DrawPanel构造函数的参数，从而创建的DrawPanel可以绘制圆形。
 		MyCircle[] circles = new MyCircle[10];
 		for (int count = 0; count < circles.length; count++) {
-			int x = randomNumber.nextInt(400);
-			int y = randomNumber.nextInt(300);
-			int radius = randomNumber.nextInt(100);
+			int radius = 10 + randomNumber.nextInt(40);
+			int x = radius + randomNumber.nextInt(PANEL_WIDTH - 2 * radius);
+			int y = radius + randomNumber.nextInt(PANEL_HEIGHT - 2 * radius);
 			Color color = new Color(randomNumber.nextInt(256), randomNumber.nextInt(256),
 					randomNumber.nextInt(256));
 			circles[count] = new MyCircle(x, y, radius, color);
@@ -53,10 +60,10 @@ public class TestDraw {
 		//这个函数的解释见上面函数的解释
 		MyRectangle[] rectangles = new MyRectangle[10];
 		for (int count = 0; count < rectangles.length; count++) {
-			int x = randomNumber.nextInt(400);
-			int y = randomNumber.nextInt(300);
-			int width = randomNumber.nextInt(400);
-			int height = randomNumber.nextInt(300);
+			int width = 20 + randomNumber.nextInt(100);
+			int height = 20 + randomNumber.nextInt(100);
+			int x = randomNumber.nextInt(PANEL_WIDTH - width);
+			int y = randomNumber.nextInt(PANEL_HEIGHT - height);
 			Color color = new Color(randomNumber.nextInt(256), randomNumber.nextInt(256),
 					randomNumber.nextInt(256));
 			rectangles[count] = new MyRectangle(x, y, width, height, color);

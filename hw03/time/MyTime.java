@@ -1,9 +1,6 @@
 package homework3.time;
 
-import homework3.mygui.Shape;
-import java.awt.*;
-
-public class MyTime implements Shape {
+public class MyTime {
     private int hour;
     private int minute;
     private int second;
@@ -67,41 +64,14 @@ public class MyTime implements Shape {
         return String.format("%02d:%02d:%02d", hour, minute, second);
     }
 
-    @Override
     public String toString() {
         return String.format("%02d:%02d:%02d %s", ((hour == 0 || hour == 12) ? 12 : hour % 12),
         minute, second, ((hour < 12) ? "AM" : "PM"));
     }
 
-    @Override
-    public void draw(Graphics g) {
-        // 获取当前绘图区域的边界
-        Rectangle board = g.getClipBounds();
-        // 根据边界取中心坐标以及半径
-        int centerX = (int) board.getCenterX();
-        int centerY = (int) board.getCenterY();
-        int radius = (int) (Math.min(board.getWidth(), board.getHeight()) * 0.4);
+    public int getHour() { return hour; }
 
-        g.setColor(Color.BLACK);
-        g.drawOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
-        g.drawString("12", centerX, (int) (centerY - 0.9 * radius));
-        g.drawString("3", (int) (centerX + 0.9 * radius), centerY);
-        g.drawString("6",centerX, (int) (centerY + 0.9 * radius));
-        g.drawString("9", (int) (centerX - 0.9 * radius), centerY);
+    public int getMinute() { return minute; }
 
-        drawPointer(g, centerX, centerY, second * 6, (int) (0.85 * radius), Color.RED);
-        drawPointer(g, centerX, centerY, minute * 6, (int) (0.65 * radius), Color.BLUE);    // 鉴于误差很小，并没有做出秒针对分针的影响
-        drawPointer(g, centerX, centerY, (hour % 12 + minute / 60.0) * 30, (int) (0.5 * radius), Color.GREEN);
-    }
-
-    private void drawPointer(Graphics g, int x, int y, double angle, int len, Color color) {
-        // 根据时钟坐标与java默认坐标进行旋转转换
-        double convertedAngle = Math.toRadians(angle - 90);
-
-        int endX = (int) (x + len * Math.cos(convertedAngle));
-        int endY = (int) (y + len * Math.sin(convertedAngle));
-
-        g.setColor(color);
-        g.drawLine(x, y, endX, endY);
-    }
+    public int getSecond() { return second; }
 }

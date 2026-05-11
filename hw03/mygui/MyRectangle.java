@@ -3,13 +3,13 @@ package homework3.mygui;
 import java.awt.*;
 
 public class MyRectangle implements Shape {
-	public int x;
-	public int y;
-	public int width;
-	public int height;
-	public Color color;
+	private final int x;
+	private final int y;
+	private final int width;
+	private final int height;
+	private final Color color;
 
-	public MyRectangle(int x, int y, int width, int height,Color color) {
+	public MyRectangle(int x, int y, int width, int height, Color color) {
 		this.x = x;
 		this.y = y;
 		this.width = width;

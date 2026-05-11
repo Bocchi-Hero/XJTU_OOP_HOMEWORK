@@ -4,11 +4,11 @@ import java.awt.Graphics;
 import java.awt.Color;
 
 public class MyLine implements Shape {
-	private int x1;
-	private int y1;
-	private int x2;
-	private int y2;
-	private Color color;
+	private final int x1;
+	private final int y1;
+	private final int x2;
+	private final int y2;
+	private final Color color;
 
 	public MyLine(int x1, int y1, int x2, int y2, Color color) {
 		this.x1 = x1;

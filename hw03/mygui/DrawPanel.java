@@ -11,11 +11,13 @@ public class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private Shape[] shapes;
 
-	public DrawPanel() {}
+	public DrawPanel() {
+		this(new Shape[0]);
+	}
 
 	public DrawPanel(Shape[] shapes) {
 		setBackground(Color.WHITE);
-		this.shapes = shapes;
+		this.shapes = shapes.clone();
 	}
 
 	@Override

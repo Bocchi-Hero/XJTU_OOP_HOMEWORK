@@ -9,6 +9,10 @@ import java.time.LocalTime;
 
 public class ClockApp {
     public static void main(String[] args) {
+        SwingUtilities.invokeLater(ClockApp::createAndShowGUI);
+    }
+
+    private static void createAndShowGUI() {
         // 创建窗口
         JFrame frame = new JFrame("My Clock");
 
@@ -17,10 +21,10 @@ public class ClockApp {
         int hour = currentTime.getHour();
         int minute = currentTime.getMinute();
         int second = currentTime.getSecond();
-        MyTime myTimer = new MyTime(hour, minute, second);
+        MyTime myTime = new MyTime(hour, minute, second);
 
-        // 将myTimer包装进数组中，方便对DrawPanel的传参
-        Shape[] shapes = new Shape[] { myTimer };
+        // 将时钟图形包装进数组中，方便对DrawPanel传参
+        Shape[] shapes = new Shape[] { new ClockShape(myTime) };
         DrawPanel panel = new DrawPanel(shapes);
 
         frame.add(panel);
@@ -28,21 +32,10 @@ public class ClockApp {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);   // 确定关闭行为
         frame.setVisible(true); // 使窗口显现
 
-        // 启用多线程驱动时钟
-        Thread t = new Thread() {
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000); //设置绘制的时间间隔为 1 秒
-                    } catch (InterruptedException e) {
-                        System.err.println(e);
-                    }
-                    myTimer.incrementSecond();
-                    //更新绘制图形面板上的内容（也就是绘制的图像）
-                    panel.updateUI();
-                }
-            }
-        };
-        t.start();
+        Timer timer = new Timer(1000, event -> {
+            myTime.incrementSecond();
+            panel.repaint();
+        });
+        timer.start();
     }
 }
