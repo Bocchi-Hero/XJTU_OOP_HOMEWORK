@@ -1,0 +1,72 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "homework3.mygui" {
+  interface Shape {
+    +draw(g: Graphics): void
+  }
+
+  class MyCircle {
+    -centerX: int
+    -centerY: int
+    -radius: int
+    -color: Color
+    +MyCircle(centerX: int, centerY: int, radius: int, color: Color)
+    +draw(g: Graphics): void
+  }
+
+  class MyLine {
+    -x1: int
+    -y1: int
+    -x2: int
+    -y2: int
+    -color: Color
+    +MyLine(x1: int, y1: int, x2: int, y2: int, color: Color)
+    +draw(g: Graphics): void
+  }
+
+  class MyRectangle {
+    -x: int
+    -y: int
+    -width: int
+    -height: int
+    -color: Color
+    +MyRectangle(x: int, y: int, width: int, height: int, color: Color)
+    +draw(g: Graphics): void
+  }
+
+  class DrawPanel {
+    -serialVersionUID: long
+    -shapes: Shape[]
+    +DrawPanel()
+    +DrawPanel(shapes: Shape[])
+    +paintComponent(g: Graphics): void
+  }
+
+  class TestDraw {
+    -PANEL_WIDTH: int
+    -PANEL_HEIGHT: int
+    -randomNumber: Random
+    +main(args: String[]): void
+    -createAndShowGUI(): void
+    +generateLines(): MyLine[]
+    +generateCircles(): MyCircle[]
+    +generateRectangles(): MyRectangle[]
+  }
+}
+
+MyCircle ..|> Shape
+MyLine ..|> Shape
+MyRectangle ..|> Shape
+DrawPanel *-- "0..*" Shape : shapes
+DrawPanel ..> Graphics
+DrawPanel --|> javax.swing.JPanel
+TestDraw ..> DrawPanel
+TestDraw ..> MyLine
+TestDraw ..> MyCircle
+TestDraw ..> MyRectangle
+TestDraw ..> Random
+TestDraw ..> JFrame
+TestDraw ..> SwingUtilities
+@enduml
