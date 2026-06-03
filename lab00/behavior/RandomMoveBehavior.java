@@ -16,4 +16,7 @@ public class RandomMoveBehavior implements Behavior {
         double dirY = Math.sin(angle);
         self.accelerationToward(dirX, dirY, 1.0, dt);
     }
+
+     @Override
+    public String name() { return "随机"; }
 }

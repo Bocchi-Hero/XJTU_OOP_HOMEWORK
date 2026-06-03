@@ -1,9 +1,6 @@
 package agentdemo.model;
 
-
-import agentdemo.behavior.AvoidNearestBehavior;
-import agentdemo.behavior.ChaseBehavior;
-import agentdemo.behavior.RandomMoveBehavior;
+import agentdemo.behavior.BehaviorRegistry;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,17 +11,23 @@ public class World {
     private final int height;
     private final List<Agent> agents = new ArrayList<>();
     private Agent selectedAgent;
+    private double speedMultiplier = 1.0;
 
     public World(int width, int height) {
         this.width = width;
         this.height = height;
+    }
 
-        agents.add(new Agent(100, 100, 10, 10, 10,
-                "A", new RandomMoveBehavior(), java.awt.Color.BLUE));
-        agents.add(new Agent(300, 200, 10, 10, 10,
-                "B", new ChaseBehavior(), java.awt.Color.RED));
-        agents.add(new Agent(200, 150, 10, 10, 10,
-                "C", new AvoidNearestBehavior(), Color.GREEN));
+    public static World createWorld(int width, int height, BehaviorRegistry registry) {
+        World world = new World(width, height);
+        world.addAgent(new Agent(100, 100, 10, 10, 10,
+                "A", registry.getBehavior(0), java.awt.Color.BLUE));
+        world.addAgent(new Agent(300, 200, 10, 10, 10,
+                "B", registry.getBehavior(1), java.awt.Color.RED));
+        world.addAgent(new Agent(200, 150, 10, 10, 10,
+                "C", registry.getBehavior(2), Color.GREEN));
+        world.selectedAgent = world.agents.get(0);
+        return world;
     }
 
     public void update(double dt) {
@@ -75,4 +78,6 @@ public class World {
         return agents.isEmpty() ? null : agents.get(0);
     }
     public Agent getSelectedAgent() { return selectedAgent; }
+    public double getSpeedMultiplier() { return speedMultiplier; }
+    public void setSpeedMultiplier(double speedMultiplier) { this.speedMultiplier = speedMultiplier; }
 }

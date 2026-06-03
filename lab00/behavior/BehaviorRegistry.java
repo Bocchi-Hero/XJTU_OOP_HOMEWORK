@@ -3,8 +3,16 @@ package agentdemo.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BehaviorRegister {
+public class BehaviorRegistry {
     private final List<Display> behaviors = new ArrayList<>();
+
+    public static BehaviorRegistry createDefault() {
+        BehaviorRegistry registry = new BehaviorRegistry();
+        registry.register("随机移动", new RandomMoveBehavior());
+        registry.register("追逐", new ChaseBehavior());
+        registry.register("躲避", new AvoidNearestBehavior());
+        return registry;
+    }
 
     public void register(String displayName, Behavior behavior) {
         behaviors.add(new Display(displayName, behavior));

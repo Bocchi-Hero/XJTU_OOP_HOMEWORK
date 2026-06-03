@@ -9,8 +9,14 @@ public class ChaseBehavior implements Behavior {
     @Override
     public void update(Agent self, World world, double dt) {
         Agent target = world.findNearestAgent(self, MAX_PERCEPTION_RANGE);
-        if (target == null) return;
+        if (target == null) {
+            self.applyDrag(0.97);
+            return;
+        }
 
         self.accelerationTo(target.getX(), target.getY(), 1.5, dt);
     }
+
+    @Override
+    public String name() { return "追逐"; }
 }

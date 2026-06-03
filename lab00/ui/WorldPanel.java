@@ -35,8 +35,40 @@ public class WorldPanel extends JPanel {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // 绘制网格线
+        drawGrid(g2);
+        drawAgents(g2);
+    }
+
+    private void drawGrid(Graphics2D g2) {
+        int gridSize = 30;
+        g2.setColor(new Color(220, 220, 220));
+        for (int x = 0; x < getWidth(); x += gridSize) {
+            g2.drawLine(x, 0, x, getHeight());
+        }
+        for (int y = 0; y < getHeight(); y += gridSize) {
+            g2.drawLine(0, y, getWidth(), y);
+        }
+
         for (Agent a : world.getAgents()) {
             a.draw(g2, a == world.getSelectedAgent());
+        }
+    }
+
+    private void drawAgents(Graphics2D g2) {
+        FontMetrics metrics = g2.getFontMetrics();
+        for (Agent agent : world.getAgents()) {
+            boolean selected = agent == world.getSelectedAgent();
+            agent.draw(g2, selected);
+            String label = agent.getName() + " - " + agent.getBehavior().name();
+            int labelX = (int) (agent.getX() + agent.getRadius() + 5);
+            int labelY = (int) (agent.getY() - agent.getRadius() - 4);
+            g2.setColor(new Color(30, 34, 38));
+            g2.drawString(label, labelX, labelY);
+            if (selected) {
+                String speed = String.format("v=%.1f", agent.getV());
+                g2.drawString(speed, labelX, labelY + metrics.getHeight());
+            }
         }
     }
 

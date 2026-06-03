@@ -34,6 +34,7 @@ public class Agent {
             behavior.update(this, world, dt);
         }
         move(dt);
+        applyDrag(0.98);
         handleBoundary(world);
     }
 
@@ -84,6 +85,11 @@ public class Agent {
         limitSpeed();
     }
 
+    public void applyDrag(double factor) {
+        vx *= factor;
+        vy *= factor;
+    }
+
     // 朝目标点加速
     public void accelerationTo(double targetX, double targetY, double strength, double dt) {
         accelerationToward(targetX - this.x, targetY - this.y, strength, dt);
@@ -121,8 +127,7 @@ public class Agent {
 
     public double getX() { return x; }
     public double getY() { return y; }
-    public double getVx() { return vx; }
-    public double getVy() { return vy; }
+    public double getV() { return Math.hypot(vx, vy); }
     public double getRadius() { return radius; }
     public Color getColor() { return color; }
     public String getName() { return this.name; }
