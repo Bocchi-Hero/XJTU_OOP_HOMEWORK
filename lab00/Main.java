@@ -3,15 +3,12 @@ package agentdemo;
 import agentdemo.behavior.BehaviorRegistry;
 import agentdemo.engine.SimulationEngine;
 import agentdemo.engine.SwingSimulationLoop;
-import agentdemo.model.Agent;
 import agentdemo.model.World;
 import agentdemo.ui.ControlPanel;
 import agentdemo.ui.WorldPanel;
 
 import javax.swing.*;
 import java.awt.*;
-
-import static agentdemo.model.World.createWorld;
 
 public class Main {
     public static void main(String[] args) {
@@ -30,6 +27,7 @@ public class Main {
             ControlPanel controlPanel = new ControlPanel(world, engine, registry);
             SwingSimulationLoop loop = new SwingSimulationLoop(engine, () -> {
                 controlPanel.updateSelection(world.getSelectedAgent());
+                controlPanel.updateStatus();
                 panel.repaint();
             });
             world.saveInitialState();

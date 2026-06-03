@@ -28,6 +28,8 @@ public class World {
                 "B", registry.getBehavior(1), java.awt.Color.RED));
         world.addAgent(new Agent(200, 150, 10, 10, 10,
                 "C", registry.getBehavior(2), Color.GREEN));
+        world.addAgent(new Agent(400, 250, 10, 10, 10,
+                "D", registry.getBehavior(3), Color.YELLOW));
         world.selectedAgent = world.agents.get(0);
         return world;
     }

@@ -11,6 +11,7 @@ public class BehaviorRegistry {
         registry.register("随机移动", new RandomMoveBehavior());
         registry.register("追逐", new ChaseBehavior());
         registry.register("躲避", new AvoidNearestBehavior());
+        registry.register("巡逻", new PatrolBehavior());
         return registry;
     }
 

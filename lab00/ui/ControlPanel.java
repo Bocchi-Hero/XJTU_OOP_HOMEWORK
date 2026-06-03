@@ -1,6 +1,8 @@
 package agentdemo.ui;
 
+import agentdemo.behavior.AvoidNearestBehavior;
 import agentdemo.behavior.BehaviorRegistry;
+import agentdemo.behavior.ChaseBehavior;
 import agentdemo.engine.SimulationEngine;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
@@ -16,6 +18,7 @@ public class ControlPanel extends JPanel {
     private JComboBox<String> behaviorCombo;
     private JSlider speedSlider;
     private JLabel speedLabel;
+    private JLabel targetLabel;
     private SimulationEngine engine;
 
     public ControlPanel(World world, SimulationEngine engine, BehaviorRegistry registry) {
@@ -51,8 +54,16 @@ public class ControlPanel extends JPanel {
         add(speedLabel);
         add(Box.createRigidArea(new Dimension(0, 12)));
 
+        targetLabel = new JLabel("");
+        targetLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        targetLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
+        targetLabel.setForeground(new Color(80, 80, 80));
+        add(targetLabel);
+        add(Box.createRigidArea(new Dimension(0, 8)));
+        add(Box.createRigidArea(new Dimension(0, 12)));
+
         // 行为策略Label
-        JLabel behaviorTitle = new JLabel("行为策略");
+        JLabel behaviorTitle = new JLabel("行为策略: ");
         behaviorTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         behaviorTitle.setMaximumSize(new Dimension(200, 30));
         add(behaviorTitle);
@@ -108,7 +119,7 @@ public class ControlPanel extends JPanel {
             engine.setTimeSpeedMultiplier(speedSlider.getValue() / 100.0);
         });
 
-        JButton reset = new JButton("重置");
+        JButton reset = new JButton("   重   置   ");
         reset.setAlignmentX(Component.CENTER_ALIGNMENT);
         reset.addActionListener(e -> {
             world.reset();
@@ -134,19 +145,30 @@ public class ControlPanel extends JPanel {
             double x = Math.random() * world.getWidth();
             double y = Math.random() * world.getHeight();
             Color color = Color.getHSBColor((float) Math.random(), 0.8f, 0.9f);
-            Agent agent = new Agent(x, y, 0, 0, 10, name, registry.getBehavior((int) (Math.random() * 3)), color);
+            Agent agent = new Agent(x, y, 0, 0, 10, name, registry.getBehavior((int) (Math.random() * 4)), color);
             world.addAgent(agent);
         });
         return addAgent;
     }
 
     // 每帧刷新速度显示
-    public void updateSpeed() {
+    public void updateStatus() {
         if (selectedAgent != null) {
             speedLabel.setText("速度：" + String.format("%.1f", selectedAgent.getV()));
-        } else {
-            speedLabel.setText("速度：--");
+
+        String info = "";
+        if (selectedAgent.getBehavior() instanceof ChaseBehavior) {
+            Agent target = ((ChaseBehavior) selectedAgent.getBehavior()).getCurrentTarget();
+            info = target != null ? "目标：" + target.getName() : "目标：无";
+        } else if (selectedAgent.getBehavior() instanceof AvoidNearestBehavior) {
+            Agent threat = ((AvoidNearestBehavior) selectedAgent.getBehavior()).getCurrentThreat();
+            info = threat != null ? "威胁：" + threat.getName() : "威胁：无";
         }
+        targetLabel.setText(info);
+    } else {
+        speedLabel.setText("速度：--");
+        targetLabel.setText("");
+    }
     }
 
     // 更新选中对象
