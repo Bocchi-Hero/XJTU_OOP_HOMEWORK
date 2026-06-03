@@ -1,4 +1,7 @@
-package agentdemo;
+package agentdemo.behavior;
+
+import agentdemo.model.Agent;
+import agentdemo.model.World;
 
 /**
  * 行为策略接口（Demo 版本）
@@ -12,7 +15,7 @@ public interface Behavior {
      * @param self  当前智能体
      * @param world 所在世界环境
      */
-    void update(Agent self, World world);
+    void update(Agent self, World world, double dt);
 
     /**
      * 返回行为名称（用于调试或显示）

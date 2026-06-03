@@ -1,0 +1,135 @@
+package agentdemo.model;
+
+import agentdemo.behavior.Behavior;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+
+public class Agent {
+    private double x;
+    private double y;
+    private double vx;
+    private double vy;
+    private double radius;
+    private String name;
+    private Behavior behavior;
+    private Color color;
+    private double maxSpeed = 100.0;
+    private double acceleration = 170.0;
+
+    public Agent(double x, double y, double vx, double vy, double radius, String name, Behavior behavior, Color color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = radius;
+        this.name = name;
+        this.behavior = behavior;
+        this.color = color;
+    }
+
+    // dt 时间（即一帧）后对agent状态的更新
+    public void update(World world, double dt) {
+        if (behavior != null) {
+            behavior.update(this, world, dt);
+        }
+        move(dt);
+        handleBoundary(world);
+    }
+
+    public void move(double dt) {
+        x += vx * dt;
+        y += vy * dt;
+    }
+
+    // 边界处理
+    public void handleBoundary(World world) {
+        if (x < radius) {
+            x = radius;
+            vx = Math.abs(vx);
+        } else if (x > world.getWidth() - radius) {
+            x = world.getWidth() - radius;
+            vx = -Math.abs(vx);
+        }
+
+        if (y < radius) {
+            y = radius;
+            vy = Math.abs(vy);
+        } else if (y > world.getHeight() - radius) {
+            y = world.getHeight() - radius;
+            vy = -Math.abs(vy);
+        }
+    }
+
+    // 限制速度
+    public void limitSpeed() {
+        double speed = Math.sqrt(vx * vx + vy * vy);
+        if (speed <= maxSpeed && speed > 1e-9) {
+            return;
+        }
+        vx = vx / speed * maxSpeed;
+        vy = vy / speed * maxSpeed;
+    }
+
+    // 朝某个方向加速
+    public void accelerationToward(double dirX, double dirY, double strength, double dt) {
+        double length = Math.sqrt(dirX * dirX + dirY * dirY);
+        if (length < 1e-9) {
+            return;
+        }
+
+        vx += dirX / length * acceleration * strength * dt;
+        vy += dirY / length * acceleration * strength * dt;
+
+        limitSpeed();
+    }
+
+    // 朝目标点加速
+    public void accelerationTo(double targetX, double targetY, double strength, double dt) {
+        accelerationToward(targetX - this.x, targetY - this.y, strength, dt);
+    }
+
+    public void draw(Graphics2D g, boolean selected) {
+        double size = 2 * radius;
+        if (selected) {
+            g.setColor(new Color(255, 190, 40, 120));
+            g.fill(new Ellipse2D.Double(x - radius - 5, y - radius - 5, size + 10, size + 10));
+        }
+        g.setColor(color);
+        g.fill(new Ellipse2D.Double(x - radius, y - radius, size, size));
+
+        g.setColor(Color.BLACK);
+        g.draw(new Ellipse2D.Double(x - radius, y - radius, size, size));
+        g.drawLine((int) x, (int) y, (int) (x + vx * 0.20), (int) (y + vy * 0.20));
+
+    }
+
+    // 和目标点距离
+    public double distanceTo(Agent another) {
+        return distanceTo(another.x, another.y);
+    }
+
+    // 和鼠标距离
+    public double distanceTo(double mouseX, double mouseY) {
+        return Math.hypot(this.x - mouseX, this.y - mouseY);
+    }
+
+    // 是否被鼠标选中
+    public boolean contains(double mouseX, double mouseY) {
+        return distanceTo(mouseX, mouseY) <= this.radius;
+    }
+
+    public double getX() { return x; }
+    public double getY() { return y; }
+    public double getVx() { return vx; }
+    public double getVy() { return vy; }
+    public double getRadius() { return radius; }
+    public Color getColor() { return color; }
+    public String getName() { return this.name; }
+    public Behavior getBehavior() { return this.behavior; }
+
+    public void setRadius(double radius) { this.radius = radius; }
+    public void setColor(Color color) { this.color = color; }
+    public void setName(String name) { this.name = name; }
+    public void setBehavior(Behavior behavior) { this.behavior = behavior; }
+}
