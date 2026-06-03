@@ -1,6 +1,7 @@
 package agentdemo.ui;
 
 import agentdemo.behavior.BehaviorRegistry;
+import agentdemo.engine.SimulationEngine;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
 
@@ -15,9 +16,11 @@ public class ControlPanel extends JPanel {
     private JComboBox<String> behaviorCombo;
     private JSlider speedSlider;
     private JLabel speedLabel;
+    private SimulationEngine engine;
 
-    public ControlPanel(World world, BehaviorRegistry registry) {
+    public ControlPanel(World world, SimulationEngine engine, BehaviorRegistry registry) {
         this.world = world;
+        this.engine = engine;
         this.registry = registry;
 
         // 设置面板的首选尺寸，Dimension是一个表示宽高的对象
@@ -72,8 +75,9 @@ public class ControlPanel extends JPanel {
 
         // 时间流速Label
         JLabel timeSpeedLabel = new JLabel("时间流速");
-        timeSpeedLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        timeSpeedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(timeSpeedLabel);
+        add(Box.createRigidArea(new Dimension(0, 12)));
 
         // 速度条
         //创建水平方向滑块，范围 0 ~ 300，默认值 100，即 1x 速度
@@ -97,11 +101,43 @@ public class ControlPanel extends JPanel {
         speedSlider.setLabelTable(labelTable);
 
         add(speedSlider);
+        add(Box.createRigidArea(new Dimension(0, 16)));
 
         // 监听滑块变化，值除以 100.0 转化为倍率
         speedSlider.addChangeListener(e -> {
-            world.setSpeedMultiplier(speedSlider.getValue() / 100.0);
+            engine.setTimeSpeedMultiplier(speedSlider.getValue() / 100.0);
         });
+
+        JButton reset = new JButton("重置");
+        reset.setAlignmentX(Component.CENTER_ALIGNMENT);
+        reset.addActionListener(e -> {
+            world.reset();
+            engine.setTimeSpeedMultiplier(1.0);
+            speedSlider.setValue(100);
+        });
+        add(reset);
+        add(Box.createRigidArea(new Dimension(0,12)));
+
+        JButton addAgent = getButton(world, registry);
+        add(addAgent);
+    }
+
+    private JButton getButton(World world, BehaviorRegistry registry) {
+        JButton addAgent = new JButton("添加 Agent");
+        addAgent.setAlignmentX(Component.CENTER_ALIGNMENT);
+        addAgent.addActionListener(e -> {
+            if (world.getAgents().size() >= 7) {
+                JOptionPane.showMessageDialog(this, "最多只能添加到 7 个 Agent（A-G）", "提示", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            String name = generateName(world.getAgents().size());
+            double x = Math.random() * world.getWidth();
+            double y = Math.random() * world.getHeight();
+            Color color = Color.getHSBColor((float) Math.random(), 0.8f, 0.9f);
+            Agent agent = new Agent(x, y, 0, 0, 10, name, registry.getBehavior((int) (Math.random() * 3)), color);
+            world.addAgent(agent);
+        });
+        return addAgent;
     }
 
     // 每帧刷新速度显示
@@ -131,5 +167,9 @@ public class ControlPanel extends JPanel {
             }
             behaviorCombo.setEnabled(true);
         }
+    }
+
+    public String generateName(int index) {
+        return "" + (char) ('A' + index);
     }
 }

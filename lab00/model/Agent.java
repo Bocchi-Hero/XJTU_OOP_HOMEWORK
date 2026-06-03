@@ -127,6 +127,8 @@ public class Agent {
 
     public double getX() { return x; }
     public double getY() { return y; }
+    public double getVx() { return vx; }
+    public double getVy() { return vy; }
     public double getV() { return Math.hypot(vx, vy); }
     public double getRadius() { return radius; }
     public Color getColor() { return color; }
@@ -137,4 +139,13 @@ public class Agent {
     public void setColor(Color color) { this.color = color; }
     public void setName(String name) { this.name = name; }
     public void setBehavior(Behavior behavior) { this.behavior = behavior; }
+
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+    public void setVelocity(double vx, double vy) {
+        this.vx = vx;
+        this.vy = vy;
+    }
 }

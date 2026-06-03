@@ -1,6 +1,8 @@
 package agentdemo;
 
 import agentdemo.behavior.BehaviorRegistry;
+import agentdemo.engine.SimulationEngine;
+import agentdemo.engine.SwingSimulationLoop;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
 import agentdemo.ui.ControlPanel;
@@ -23,8 +25,14 @@ public class Main {
 
             BehaviorRegistry registry = BehaviorRegistry.createDefault();
             World world = World.createWorld(600, 400, registry);
+            SimulationEngine engine = new SimulationEngine(world);
             WorldPanel panel = new WorldPanel(world);
-            ControlPanel controlPanel = new ControlPanel(world, registry);
+            ControlPanel controlPanel = new ControlPanel(world, engine, registry);
+            SwingSimulationLoop loop = new SwingSimulationLoop(engine, () -> {
+                controlPanel.updateSelection(world.getSelectedAgent());
+                panel.repaint();
+            });
+            world.saveInitialState();
             controlPanel.updateSelection(world.getSelectedAgent());
 
             panel.setSelectionListener((x, y) -> {
@@ -39,13 +47,7 @@ public class Main {
             frame.pack();
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
-
-            // 简单定时器驱动仿真
-            new Timer(30, e -> {
-                world.update(0.03 * world.getSpeedMultiplier());
-                controlPanel.updateSpeed();
-                panel.repaint();
-            }).start();
+            loop.start();
         });
     }
 }

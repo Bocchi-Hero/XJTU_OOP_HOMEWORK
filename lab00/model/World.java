@@ -1,5 +1,6 @@
 package agentdemo.model;
 
+import agentdemo.behavior.Behavior;
 import agentdemo.behavior.BehaviorRegistry;
 
 import java.awt.*;
@@ -11,7 +12,8 @@ public class World {
     private final int height;
     private final List<Agent> agents = new ArrayList<>();
     private Agent selectedAgent;
-    private double speedMultiplier = 1.0;
+    private List<double[]> initialStates;
+    private List<Behavior> initialBehaviors;
 
     public World(int width, int height) {
         this.width = width;
@@ -65,6 +67,30 @@ public class World {
         return selectedAgent;
     }
 
+    public void saveInitialState() {
+        initialStates = new ArrayList<>();
+        initialBehaviors = new ArrayList<>();
+        for (Agent a : agents) {
+            initialStates.add(new double[]{a.getX(), a.getY(), a.getVx(), a.getVy()});
+            initialBehaviors.add(a.getBehavior());
+        }
+    }
+
+    public void reset() {
+        for (int i = 0; i < initialStates.size(); i++) {
+            Agent a = agents.get(i);
+            double[] s = initialStates.get(i);
+            a.setPosition(s[0], s[1]);
+            a.setVelocity(s[2], s[3]);
+            a.setBehavior(initialBehaviors.get(i));
+        }
+        // 移除新增的Agent
+        while (agents.size() > initialStates.size()) {
+            agents.remove(agents.size() - 1);
+        }
+        selectedAgent = agents.isEmpty() ? null : agents.get(0);
+    }
+
     public void addAgent(Agent agent) {
         agents.add(agent);
     }
@@ -78,6 +104,4 @@ public class World {
         return agents.isEmpty() ? null : agents.get(0);
     }
     public Agent getSelectedAgent() { return selectedAgent; }
-    public double getSpeedMultiplier() { return speedMultiplier; }
-    public void setSpeedMultiplier(double speedMultiplier) { this.speedMultiplier = speedMultiplier; }
 }
