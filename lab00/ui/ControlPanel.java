@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class ControlPanel extends JPanel {
     private static final int MAX_AGENT_COUNT = 10;
-    private static final double NEW_AGENT_RADIUS = 10.0;
+    private static final double NEW_AGENT_RADIUS = 13.0;
 
     private final World world;
     private final BehaviorRegistry registry;

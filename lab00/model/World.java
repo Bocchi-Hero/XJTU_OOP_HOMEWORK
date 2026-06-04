@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class World {
-    private final int width;
-    private final int height;
+    private static final double DEFAULT_AGENT_RADIUS = 13.0;
+
+    private int width;
+    private int height;
     private final BehaviorRegistry registry;
     private final List<Agent> agents = new ArrayList<>();
     private Agent selectedAgent;
@@ -24,15 +26,15 @@ public class World {
 
     public static World createWorld(int width, int height, BehaviorRegistry registry) {
         World world = new World(width, height, registry);
-        world.addAgent(new Agent(100, 100, 10, 10, 10,
+        world.addAgent(new Agent(100, 100, 10, 10, DEFAULT_AGENT_RADIUS,
                 "A", registry.create("random"), Color.BLUE));
-        world.addAgent(new Agent(300, 200, 10, 10, 10,
+        world.addAgent(new Agent(300, 200, 10, 10, DEFAULT_AGENT_RADIUS,
                 "B", registry.create("chase"), Color.RED));
-        world.addAgent(new Agent(200, 150, 10, 10, 10,
+        world.addAgent(new Agent(200, 150, 10, 10, DEFAULT_AGENT_RADIUS,
                 "C", registry.create("avoid"), Color.GREEN));
-        world.addAgent(new Agent(400, 250, 10, 10, 10,
+        world.addAgent(new Agent(400, 250, 10, 10, DEFAULT_AGENT_RADIUS,
                 "D", registry.create("patrol"), Color.YELLOW));
-        world.addAgent(new Agent(500, 300, -10, 10, 10,
+        world.addAgent(new Agent(500, 300, -10, 10, DEFAULT_AGENT_RADIUS,
                 "E", registry.create("random"), Color.MAGENTA));
         world.selectedAgent = world.agents.get(0);
         return world;
@@ -102,6 +104,14 @@ public class World {
 
     public void addAgent(Agent agent) {
         agents.add(agent);
+    }
+
+    public void resize(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return;
+        }
+        this.width = width;
+        this.height = height;
     }
 
     public int getWidth() { return this.width; }

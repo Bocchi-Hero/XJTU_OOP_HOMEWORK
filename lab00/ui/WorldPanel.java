@@ -5,6 +5,8 @@ import agentdemo.model.World;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
@@ -17,6 +19,12 @@ public class WorldPanel extends JPanel {
         this.world = world;
         setPreferredSize(new Dimension(600, 400));
         setBackground(Color.WHITE);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                syncWorldBoundary();
+            }
+        });
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -33,6 +41,7 @@ public class WorldPanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        syncWorldBoundary();
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -41,8 +50,12 @@ public class WorldPanel extends JPanel {
         drawAgents(g2);
     }
 
+    private void syncWorldBoundary() {
+        world.resize(getWidth(), getHeight());
+    }
+
     private void drawGrid(Graphics2D g2) {
-        int gridSize = 30;
+        int gridSize = 40;
         g2.setColor(new Color(220, 220, 220));
         for (int x = 0; x < getWidth(); x += gridSize) {
             g2.drawLine(x, 0, x, getHeight());
@@ -68,9 +81,13 @@ public class WorldPanel extends JPanel {
         g.setColor(color);
         g.fill(new Ellipse2D.Double(x - radius, y - radius, size, size));
 
+        Stroke oldStroke = g.getStroke();
         g.setColor(Color.BLACK);
+        g.setStroke(new BasicStroke(2.0f));
         g.draw(new Ellipse2D.Double(x - radius, y - radius, size, size));
-        g.drawLine((int) x, (int) y, (int) (x + vx * 0.20), (int) (y + vy * 0.20));
+        g.setStroke(new BasicStroke(2.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.drawLine((int) x, (int) y, (int) (x + vx * 0.25), (int) (y + vy * 0.25));
+        g.setStroke(oldStroke);
     }
 
     private void drawAgents(Graphics2D g2) {
