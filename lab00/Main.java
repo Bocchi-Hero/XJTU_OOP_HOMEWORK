@@ -27,7 +27,6 @@ public class Main {
             WorldPanel worldPanel = new WorldPanel(world);
             ControlPanel controlPanel = new ControlPanel(world, engine, registry);
             SwingSimulationLoop loop = new SwingSimulationLoop(engine, () -> {
-                controlPanel.updateSelection(world.getSelectedAgent());
                 controlPanel.updateStatus();
                 worldPanel.repaint();
             });

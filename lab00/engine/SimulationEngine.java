@@ -29,7 +29,7 @@ public class SimulationEngine {
     public void setRunning(boolean running) { this.running = running; }
     public void setTimeSpeedMultiplier(double timeSpeedMultiplier) {
         if (timeSpeedMultiplier < 0) {
-            throw new IllegalArgumentException("timeSpeedMultiplier must be non-negative.");
+            throw new IllegalArgumentException("TimeSpeedMultiplier must be non-negative.");
         }
         this.timeSpeedMultiplier = timeSpeedMultiplier;
     }

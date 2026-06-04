@@ -2,7 +2,6 @@ package agentdemo.model;
 
 import agentdemo.behavior.Behavior;
 import agentdemo.behavior.BehaviorRegistry;
-import agentdemo.behavior.PatrolBehavior;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,18 +10,20 @@ import java.util.List;
 public class World {
     private final int width;
     private final int height;
+    private final BehaviorRegistry registry;
     private final List<Agent> agents = new ArrayList<>();
     private Agent selectedAgent;
     private List<double[]> initialStates;
-    private List<Behavior> initialBehaviors;
+    private List<String> initialBehaviorKeys;
 
-    public World(int width, int height) {
+    public World(int width, int height, BehaviorRegistry registry) {
         this.width = width;
         this.height = height;
+        this.registry = registry;
     }
 
     public static World createWorld(int width, int height, BehaviorRegistry registry) {
-        World world = new World(width, height);
+        World world = new World(width, height, registry);
         world.addAgent(new Agent(100, 100, 10, 10, 10,
                 "A", registry.create("random"), Color.BLUE));
         world.addAgent(new Agent(300, 200, 10, 10, 10,
@@ -74,10 +75,10 @@ public class World {
 
     public void saveInitialState() {
         initialStates = new ArrayList<>();
-        initialBehaviors = new ArrayList<>();
+        initialBehaviorKeys = new ArrayList<>();
         for (Agent a : agents) {
             initialStates.add(new double[]{a.getX(), a.getY(), a.getVx(), a.getVy()});
-            initialBehaviors.add(a.getBehavior());
+            initialBehaviorKeys.add(a.getBehaviorKey());
         }
     }
 
@@ -90,19 +91,13 @@ public class World {
             double[] s = initialStates.get(i);
             a.setPosition(s[0], s[1]);
             a.setVelocity(s[2], s[3]);
-            a.setBehavior(initialBehaviors.get(i));
+            a.setBehavior(registry.create(initialBehaviorKeys.get(i)));
         }
         // 移除新增的Agent
         while (agents.size() > initialStates.size()) {
             agents.remove(agents.size() - 1);
         }
         selectedAgent = agents.isEmpty() ? null : agents.get(0);
-        // 重置巡逻行为状态
-        for (Behavior b : initialBehaviors) {
-            if (b instanceof PatrolBehavior) {
-                ((PatrolBehavior) b).reset();
-            }
-        }
     }
 
     public void addAgent(Agent agent) {

@@ -1,8 +1,5 @@
 package agentdemo.ui;
 
-import agentdemo.behavior.AvoidNearestBehavior;
-import agentdemo.behavior.Behavior;
-import agentdemo.behavior.ChaseBehavior;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
 
@@ -90,16 +87,8 @@ public class WorldPanel extends JPanel {
                 String speed = String.format("v=%.1f", agent.getV());
                 g2.drawString(speed, labelX, labelY + metrics.getHeight());
 
-                Behavior b = agent.getBehavior();
-                String extra = null;
-                if (b instanceof ChaseBehavior) {
-                    Agent t = ((ChaseBehavior) b).getCurrentTarget();
-                    extra = t != null ? "目标：" + t.getName() : "目标：无";
-                } else if (b instanceof AvoidNearestBehavior) {
-                    Agent t = ((AvoidNearestBehavior) b).getCurrentThreat();
-                    extra = t != null ? "威胁：" + t.getName() : "威胁：无";
-                }
-                if (extra != null) {
+                String extra = agent.getBehavior().statusText();
+                if (!extra.isEmpty()) {
                     g2.drawString(extra, labelX, labelY + metrics.getHeight() * 2);
                 }
             }

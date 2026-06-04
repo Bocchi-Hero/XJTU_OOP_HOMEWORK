@@ -1,9 +1,7 @@
 package agentdemo.ui;
 
-import agentdemo.behavior.AvoidNearestBehavior;
 import agentdemo.behavior.BehaviorDefinition;
 import agentdemo.behavior.BehaviorRegistry;
-import agentdemo.behavior.ChaseBehavior;
 import agentdemo.engine.SimulationEngine;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
@@ -12,15 +10,18 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ControlPanel extends JPanel {
-    private World world;
-    private BehaviorRegistry registry;
+    private static final int MAX_AGENT_COUNT = 10;
+    private static final double NEW_AGENT_RADIUS = 10.0;
+
+    private final World world;
+    private final BehaviorRegistry registry;
     private Agent selectedAgent;
-    private JLabel agentLabel;
-    private JComboBox<BehaviorDefinition> behaviorCombo = new JComboBox<>();
+    private final JLabel agentLabel;
+    private final JComboBox<BehaviorDefinition> behaviorCombo;
     private JSlider speedSlider;
-    private JLabel speedLabel;
-    private JLabel targetLabel;
-    private SimulationEngine engine;
+    private final JLabel speedLabel;
+    private final JLabel targetLabel;
+    private final SimulationEngine engine;
     private JButton pauseButton;
     private boolean updatingSelection;
 
@@ -28,6 +29,10 @@ public class ControlPanel extends JPanel {
         this.world = world;
         this.engine = engine;
         this.registry = registry;
+        this.agentLabel = new JLabel("未选中");
+        this.speedLabel = new JLabel("速度：--");
+        this.targetLabel = new JLabel("");
+        this.behaviorCombo = new JComboBox<>(registry.definitions().toArray(new BehaviorDefinition[0]));
 
         // 设置面板的首选尺寸，Dimension是一个表示宽高的对象
         setPreferredSize(new Dimension(230, 520));
@@ -45,19 +50,16 @@ public class ControlPanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 20)));
 
         // agent选中状态Label
-        agentLabel = new JLabel("未选中");
         agentLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         agentLabel.setMaximumSize(new Dimension(200, 30));
         add(agentLabel);
         add(Box.createRigidArea(new Dimension(0, 12)));
 
-        speedLabel = new JLabel("速度：--");
         speedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         speedLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         add(speedLabel);
         add(Box.createRigidArea(new Dimension(0, 12)));
 
-        targetLabel = new JLabel("");
         targetLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         targetLabel.setFont(new Font("Microsoft YaHei UI", Font.PLAIN, 12));
         targetLabel.setForeground(new Color(80, 80, 80));
@@ -73,7 +75,6 @@ public class ControlPanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 12)));
 
         // 有下拉表，可以选择行为策略
-        behaviorCombo = new JComboBox<>(registry.definitions().toArray(new BehaviorDefinition[0]));
         behaviorCombo.setMaximumSize(new Dimension(200, 30));
         behaviorCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(behaviorCombo);
@@ -143,6 +144,7 @@ public class ControlPanel extends JPanel {
             engine.setTimeSpeedMultiplier(1.0);
             speedSlider.setValue(100);
             pauseButton.setText("暂   停");
+            updateSelection(world.getSelectedAgent());
         });
         add(reset);
         add(Box.createRigidArea(new Dimension(0,12)));
@@ -155,7 +157,7 @@ public class ControlPanel extends JPanel {
         JButton addAgent = new JButton("添加 Agent");
         addAgent.setAlignmentX(Component.CENTER_ALIGNMENT);
         addAgent.addActionListener(e -> {
-            if (world.getAgents().size() >= 10) {
+            if (world.getAgents().size() >= MAX_AGENT_COUNT) {
                 JOptionPane.showMessageDialog(this,
                         "最多只能添加到 10 个 Agent（A-J）",
                         "提示",
@@ -163,18 +165,22 @@ public class ControlPanel extends JPanel {
                 return;
             }
             String name = generateName(world.getAgents().size());
-            double x = Math.random() * world.getWidth();
-            double y = Math.random() * world.getHeight();
+            double x = randomCoordinate(world.getWidth());
+            double y = randomCoordinate(world.getHeight());
             Color color = Color.getHSBColor((float) Math.random(), 0.8f, 0.9f);
             var definitions = registry.definitions();
             BehaviorDefinition definition =
                     definitions.get((int) (Math.random() * definitions.size()));
 
-            Agent agent = new Agent(x, y, 0, 0, 10, name,
+            Agent agent = new Agent(x, y, 0, 0, NEW_AGENT_RADIUS, name,
                     registry.create(definition.getKey()), color);
             world.addAgent(agent);
         });
         return addAgent;
+    }
+
+    private double randomCoordinate(int size) {
+        return NEW_AGENT_RADIUS + Math.random() * (size - 2 * NEW_AGENT_RADIUS);
     }
 
     // 每帧刷新速度显示
@@ -182,15 +188,7 @@ public class ControlPanel extends JPanel {
         if (selectedAgent != null) {
             speedLabel.setText("速度：" + String.format("%.1f", selectedAgent.getV()));
 
-            String info = "";
-            if (selectedAgent.getBehavior() instanceof ChaseBehavior) {
-                Agent target = ((ChaseBehavior) selectedAgent.getBehavior()).getCurrentTarget();
-                info = target != null ? "目标：" + target.getName() : "目标：无";
-            } else if (selectedAgent.getBehavior() instanceof AvoidNearestBehavior) {
-                Agent threat = ((AvoidNearestBehavior) selectedAgent.getBehavior()).getCurrentThreat();
-                info = threat != null ? "威胁：" + threat.getName() : "威胁：无";
-            }
-            targetLabel.setText(info);
+            targetLabel.setText(selectedAgent.getBehavior().statusText());
         } else {
             speedLabel.setText("速度：--");
             targetLabel.setText("");

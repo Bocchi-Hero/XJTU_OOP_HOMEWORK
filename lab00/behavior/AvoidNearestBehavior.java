@@ -3,7 +3,7 @@ package agentdemo.behavior;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
 
-public class AvoidNearestBehavior implements Behavior{
+public class AvoidNearestBehavior implements Behavior {
     public static final double MAX_PERCEPTION_RANGE = 125.0;
     private Agent currentThreat;
 
@@ -15,6 +15,11 @@ public class AvoidNearestBehavior implements Behavior{
     @Override
     public String displayName() {
         return "回避";
+    }
+
+    @Override
+    public String statusText() {
+        return currentThreat != null ? "威胁：" + currentThreat.getName() : "威胁：无";
     }
 
     @Override

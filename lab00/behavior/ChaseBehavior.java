@@ -18,6 +18,11 @@ public class ChaseBehavior implements Behavior {
     }
 
     @Override
+    public String statusText() {
+        return currentTarget != null ? "目标：" + currentTarget.getName() : "目标：无";
+    }
+
+    @Override
     public void update(Agent self, World world, double dt) {
         currentTarget = world.findNearestAgent(self, MAX_PERCEPTION_RANGE);
         if (currentTarget == null) {

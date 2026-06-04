@@ -11,6 +11,11 @@ public interface Behavior {
 
     String key();
     String displayName();
+
+    default String statusText() {
+        return "";
+    }
+
     /**
      * 每一帧由 Agent 调用，用于更新自身状态
      *

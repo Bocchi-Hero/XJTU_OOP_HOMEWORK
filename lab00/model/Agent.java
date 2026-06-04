@@ -5,6 +5,9 @@ import agentdemo.behavior.Behavior;
 import java.awt.*;
 
 public class Agent {
+    private static final double MAX_SPEED = 100.0;
+    private static final double ACCELERATION = 170.0;
+
     private double x;
     private double y;
     private double vx;
@@ -62,12 +65,11 @@ public class Agent {
     // 限制速度
     public void limitSpeed() {
         double speed = Math.sqrt(vx * vx + vy * vy);
-        double maxSpeed = 100.0;
-        if (speed <= maxSpeed) {
+        if (speed <= MAX_SPEED) {
             return;
         }
-        vx = vx / speed * maxSpeed;
-        vy = vy / speed * maxSpeed;
+        vx = vx / speed * MAX_SPEED;
+        vy = vy / speed * MAX_SPEED;
     }
 
     // 朝某个方向加速
@@ -77,9 +79,8 @@ public class Agent {
             return;
         }
 
-        double acceleration = 170.0;
-        vx += dirX / length * acceleration * strength * dt;
-        vy += dirY / length * acceleration * strength * dt;
+        vx += dirX / length * ACCELERATION * strength * dt;
+        vy += dirY / length * ACCELERATION * strength * dt;
 
         limitSpeed();
     }
