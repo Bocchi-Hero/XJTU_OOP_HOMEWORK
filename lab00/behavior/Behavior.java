@@ -9,18 +9,14 @@ import agentdemo.model.World;
  */
 public interface Behavior {
 
+    String key();
+    String displayName();
     /**
      * 每一帧由 Agent 调用，用于更新自身状态
      *
      * @param self  当前智能体
      * @param world 所在世界环境
      */
-    void update(Agent self, World world, double dt);
 
-    /**
-     * 返回行为名称（用于调试或显示）
-     */
-    default String name() {
-        return getClass().getSimpleName();
-    }
+    void update(Agent self, World world, double dt);
 }

@@ -1,54 +1,44 @@
 package agentdemo.behavior;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BehaviorRegistry {
-    private final List<Display> behaviors = new ArrayList<>();
+    private final Map<String, BehaviorDefinition> behaviors = new LinkedHashMap<>();
 
-    public static BehaviorRegistry createDefault() {
+    public static BehaviorRegistry defaultRegistry() {
         BehaviorRegistry registry = new BehaviorRegistry();
-        registry.register("随机移动", new RandomMoveBehavior());
-        registry.register("追逐", new ChaseBehavior());
-        registry.register("躲避", new AvoidNearestBehavior());
-        registry.register("巡逻", new PatrolBehavior());
+        registry.register(new BehaviorDefinition(
+                "random",
+                "随机",
+                RandomMoveBehavior::new));
+        registry.register(new BehaviorDefinition(
+                "chase",
+                "追逐",
+                ChaseBehavior::new));
+        registry.register(new BehaviorDefinition(
+                "avoid",
+                "回避",
+                AvoidNearestBehavior::new));
+        registry.register(new BehaviorDefinition(
+                "patrol",
+                "巡逻",
+                PatrolBehavior::new));
         return registry;
     }
 
-    public void register(String displayName, Behavior behavior) {
-        behaviors.add(new Display(displayName, behavior));
-    }
+    public void register(BehaviorDefinition behavior) { behaviors.put(behavior.getKey(), behavior); }
 
-    public String[] getDisplayName() {
-        return behaviors.stream()
-                .map(d -> d.displayName)
-                .toArray(String[]::new);
-    }
-
-    public Behavior getBehavior(int index) {
-        return behaviors.get(index).behavior;
-    }
-
-    public Behavior getBehavior(String displayName) {
-        for (Display d : behaviors) {
-            if (d.displayName.equals(displayName)) {
-                return d.behavior;
-            }
+    public Behavior create(String key) {
+        BehaviorDefinition behavior = behaviors.get(key);
+        if (behavior == null) {
+            throw new IllegalArgumentException("Unknown behavior: " + key);
         }
-        return null;
+        return behavior.create();
     }
 
-    public int size() {
-        return behaviors.size();
-    }
+    public List<BehaviorDefinition> definitions() { return List.copyOf(behaviors.values()); }
 
-    static class Display {
-        String displayName;
-        Behavior behavior;
-
-        public Display(String displayName, Behavior behavior) {
-            this.displayName = displayName;
-            this.behavior = behavior;
-        }
-    }
+    public BehaviorDefinition find(String key) { return behaviors.get(key); }
 }

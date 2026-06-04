@@ -2,6 +2,7 @@ package agentdemo.model;
 
 import agentdemo.behavior.Behavior;
 import agentdemo.behavior.BehaviorRegistry;
+import agentdemo.behavior.PatrolBehavior;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -23,13 +24,15 @@ public class World {
     public static World createWorld(int width, int height, BehaviorRegistry registry) {
         World world = new World(width, height);
         world.addAgent(new Agent(100, 100, 10, 10, 10,
-                "A", registry.getBehavior(0), java.awt.Color.BLUE));
+                "A", registry.create("random"), Color.BLUE));
         world.addAgent(new Agent(300, 200, 10, 10, 10,
-                "B", registry.getBehavior(1), java.awt.Color.RED));
+                "B", registry.create("chase"), Color.RED));
         world.addAgent(new Agent(200, 150, 10, 10, 10,
-                "C", registry.getBehavior(2), Color.GREEN));
+                "C", registry.create("avoid"), Color.GREEN));
         world.addAgent(new Agent(400, 250, 10, 10, 10,
-                "D", registry.getBehavior(3), Color.YELLOW));
+                "D", registry.create("patrol"), Color.YELLOW));
+        world.addAgent(new Agent(500, 300, -10, 10, 10,
+                "E", registry.create("random"), Color.MAGENTA));
         world.selectedAgent = world.agents.get(0);
         return world;
     }
@@ -79,6 +82,9 @@ public class World {
     }
 
     public void reset() {
+        if (initialStates == null) {
+            return;
+        }
         for (int i = 0; i < initialStates.size(); i++) {
             Agent a = agents.get(i);
             double[] s = initialStates.get(i);
@@ -91,6 +97,12 @@ public class World {
             agents.remove(agents.size() - 1);
         }
         selectedAgent = agents.isEmpty() ? null : agents.get(0);
+        // 重置巡逻行为状态
+        for (Behavior b : initialBehaviors) {
+            if (b instanceof PatrolBehavior) {
+                ((PatrolBehavior) b).reset();
+            }
+        }
     }
 
     public void addAgent(Agent agent) {

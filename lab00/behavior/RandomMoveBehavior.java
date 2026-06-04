@@ -7,7 +7,17 @@ import java.util.Random;
 
 public class RandomMoveBehavior implements Behavior {
     private final Random random = new Random();
-    double angle = random.nextDouble() * Math.PI * 2;
+    private double angle = random.nextDouble() * Math.PI * 2;
+
+    @Override
+    public String key() {
+        return "random";
+    }
+
+    @Override
+    public String displayName() {
+        return "随机";
+    }
 
     @Override
     public void update(Agent self, World world, double dt) {
@@ -16,7 +26,4 @@ public class RandomMoveBehavior implements Behavior {
         double dirY = Math.sin(angle);
         self.accelerationToward(dirX, dirY, 1.0, dt);
     }
-
-     @Override
-    public String name() { return "随机"; }
 }

@@ -3,9 +3,12 @@ package agentdemo.behavior;
 import agentdemo.model.Agent;
 import agentdemo.model.World;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class PatrolBehavior implements Behavior {
     private double[][] waypoints;
-    private int currentTarget = 0;
+    private final Map<Agent, Integer> agentTargets = new HashMap<>();
     private final double arrivalThreshold = 15.0;
 
     public PatrolBehavior() {
@@ -18,7 +21,18 @@ public class PatrolBehavior implements Behavior {
     }
 
     @Override
+    public String key() {
+        return "patrol";
+    }
+
+    @Override
+    public String displayName() {
+        return "巡逻";
+    }
+
+    @Override
     public void update(Agent self, World world, double dt) {
+        int currentTarget = agentTargets.getOrDefault(self, 0);
         double targetX = waypoints[currentTarget][0];
         double targetY = waypoints[currentTarget][1];
 
@@ -28,11 +42,13 @@ public class PatrolBehavior implements Behavior {
 
         if (dist < arrivalThreshold) {
             currentTarget = (currentTarget + 1) % waypoints.length;
+            agentTargets.put(self, currentTarget);
         } else {
             self.accelerationTo(targetX, targetY, 1.0, dt);
         }
     }
 
-    @Override
-    public String name() { return "巡逻"; }
+    public void reset() {
+        agentTargets.clear();
+    }
 }

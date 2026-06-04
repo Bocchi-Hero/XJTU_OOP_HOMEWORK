@@ -1,6 +1,7 @@
 package agentdemo.ui;
 
 import agentdemo.behavior.AvoidNearestBehavior;
+import agentdemo.behavior.BehaviorDefinition;
 import agentdemo.behavior.BehaviorRegistry;
 import agentdemo.behavior.ChaseBehavior;
 import agentdemo.engine.SimulationEngine;
@@ -15,11 +16,13 @@ public class ControlPanel extends JPanel {
     private BehaviorRegistry registry;
     private Agent selectedAgent;
     private JLabel agentLabel;
-    private JComboBox<String> behaviorCombo;
+    private JComboBox<BehaviorDefinition> behaviorCombo = new JComboBox<>();
     private JSlider speedSlider;
     private JLabel speedLabel;
     private JLabel targetLabel;
     private SimulationEngine engine;
+    private JButton pauseButton;
+    private boolean updatingSelection;
 
     public ControlPanel(World world, SimulationEngine engine, BehaviorRegistry registry) {
         this.world = world;
@@ -70,7 +73,7 @@ public class ControlPanel extends JPanel {
         add(Box.createRigidArea(new Dimension(0, 12)));
 
         // 有下拉表，可以选择行为策略
-        behaviorCombo = new JComboBox<>(registry.getDisplayName());
+        behaviorCombo = new JComboBox<>(registry.definitions().toArray(new BehaviorDefinition[0]));
         behaviorCombo.setMaximumSize(new Dimension(200, 30));
         behaviorCombo.setAlignmentX(Component.CENTER_ALIGNMENT);
         add(behaviorCombo);
@@ -78,9 +81,12 @@ public class ControlPanel extends JPanel {
 
         // 对下拉表的选择进行监听，对所选中的agent应用对应的behavior
         behaviorCombo.addActionListener(e -> {
-            if (selectedAgent != null) {
-                int index = behaviorCombo.getSelectedIndex();
-                selectedAgent.setBehavior(registry.getBehavior(index));
+            if (updatingSelection || selectedAgent == null) {
+                return;
+            }
+            BehaviorDefinition definition = (BehaviorDefinition) behaviorCombo.getSelectedItem();
+            if (definition != null) {
+                selectedAgent.setBehavior(registry.create(definition.getKey()));
             }
         });
 
@@ -119,33 +125,53 @@ public class ControlPanel extends JPanel {
             engine.setTimeSpeedMultiplier(speedSlider.getValue() / 100.0);
         });
 
-        JButton reset = new JButton("   重   置   ");
+        pauseButton = new JButton("暂   停");
+        pauseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pauseButton.addActionListener(e -> {
+            boolean nextRunning = !engine.isRunning();
+            engine.setRunning(nextRunning);
+            pauseButton.setText(nextRunning ? "暂   停" : "继   续");
+        });
+        add(pauseButton);
+        add(Box.createRigidArea(new Dimension(0,12)));
+
+        JButton reset = new JButton("重   置");
         reset.setAlignmentX(Component.CENTER_ALIGNMENT);
         reset.addActionListener(e -> {
             world.reset();
+            engine.setRunning(true);
             engine.setTimeSpeedMultiplier(1.0);
             speedSlider.setValue(100);
+            pauseButton.setText("暂   停");
         });
         add(reset);
         add(Box.createRigidArea(new Dimension(0,12)));
 
-        JButton addAgent = getButton(world, registry);
+        JButton addAgent = getButton();
         add(addAgent);
     }
 
-    private JButton getButton(World world, BehaviorRegistry registry) {
+    private JButton getButton() {
         JButton addAgent = new JButton("添加 Agent");
         addAgent.setAlignmentX(Component.CENTER_ALIGNMENT);
         addAgent.addActionListener(e -> {
-            if (world.getAgents().size() >= 7) {
-                JOptionPane.showMessageDialog(this, "最多只能添加到 7 个 Agent（A-G）", "提示", JOptionPane.WARNING_MESSAGE);
+            if (world.getAgents().size() >= 10) {
+                JOptionPane.showMessageDialog(this,
+                        "最多只能添加到 10 个 Agent（A-J）",
+                        "提示",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
             String name = generateName(world.getAgents().size());
             double x = Math.random() * world.getWidth();
             double y = Math.random() * world.getHeight();
             Color color = Color.getHSBColor((float) Math.random(), 0.8f, 0.9f);
-            Agent agent = new Agent(x, y, 0, 0, 10, name, registry.getBehavior((int) (Math.random() * 4)), color);
+            var definitions = registry.definitions();
+            BehaviorDefinition definition =
+                    definitions.get((int) (Math.random() * definitions.size()));
+
+            Agent agent = new Agent(x, y, 0, 0, 10, name,
+                    registry.create(definition.getKey()), color);
             world.addAgent(agent);
         });
         return addAgent;
@@ -156,19 +182,19 @@ public class ControlPanel extends JPanel {
         if (selectedAgent != null) {
             speedLabel.setText("速度：" + String.format("%.1f", selectedAgent.getV()));
 
-        String info = "";
-        if (selectedAgent.getBehavior() instanceof ChaseBehavior) {
-            Agent target = ((ChaseBehavior) selectedAgent.getBehavior()).getCurrentTarget();
-            info = target != null ? "目标：" + target.getName() : "目标：无";
-        } else if (selectedAgent.getBehavior() instanceof AvoidNearestBehavior) {
-            Agent threat = ((AvoidNearestBehavior) selectedAgent.getBehavior()).getCurrentThreat();
-            info = threat != null ? "威胁：" + threat.getName() : "威胁：无";
+            String info = "";
+            if (selectedAgent.getBehavior() instanceof ChaseBehavior) {
+                Agent target = ((ChaseBehavior) selectedAgent.getBehavior()).getCurrentTarget();
+                info = target != null ? "目标：" + target.getName() : "目标：无";
+            } else if (selectedAgent.getBehavior() instanceof AvoidNearestBehavior) {
+                Agent threat = ((AvoidNearestBehavior) selectedAgent.getBehavior()).getCurrentThreat();
+                info = threat != null ? "威胁：" + threat.getName() : "威胁：无";
+            }
+            targetLabel.setText(info);
+        } else {
+            speedLabel.setText("速度：--");
+            targetLabel.setText("");
         }
-        targetLabel.setText(info);
-    } else {
-        speedLabel.setText("速度：--");
-        targetLabel.setText("");
-    }
     }
 
     // 更新选中对象
@@ -181,13 +207,23 @@ public class ControlPanel extends JPanel {
         } else {
             agentLabel.setText("当前选中：Agent " + agent.getName());
             speedLabel.setText("速度：" + String.format("%.1f", agent.getV()));
-            for (int i = 0; i < registry.size(); i++) {
-                if (registry.getBehavior(i).getClass() == agent.getBehavior().getClass()) {
-                    behaviorCombo.setSelectedIndex(i);
-                    break;
-                }
+            updatingSelection = true;
+            try {
+                selectBehaviorKey(agent.getBehaviorKey());
+            } finally {
+                updatingSelection = false;
             }
             behaviorCombo.setEnabled(true);
+        }
+    }
+
+    private void selectBehaviorKey(String key) {
+        for (int i = 0; i < behaviorCombo.getItemCount(); i++) {
+            BehaviorDefinition definition = behaviorCombo.getItemAt(i);
+            if (definition.getKey().equals(key)) {
+                behaviorCombo.setSelectedIndex(i);
+                return;
+            }
         }
     }
 

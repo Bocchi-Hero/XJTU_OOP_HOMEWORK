@@ -8,6 +8,16 @@ public class ChaseBehavior implements Behavior {
     private Agent currentTarget;
 
     @Override
+    public String key() {
+        return "chase";
+    }
+
+    @Override
+    public String displayName() {
+        return "追逐";
+    }
+
+    @Override
     public void update(Agent self, World world, double dt) {
         currentTarget = world.findNearestAgent(self, MAX_PERCEPTION_RANGE);
         if (currentTarget == null) {
@@ -17,9 +27,6 @@ public class ChaseBehavior implements Behavior {
 
         self.accelerationTo(currentTarget.getX(), currentTarget.getY(), 1.5, dt);
     }
-
-    @Override
-    public String name() { return "追逐"; }
 
     public Agent getCurrentTarget() { return currentTarget; }
 }

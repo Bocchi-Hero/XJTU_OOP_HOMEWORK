@@ -17,30 +17,31 @@ public class Main {
             UIManager.put("Label.font", defaultFont);
             UIManager.put("Button.font", defaultFont);
             UIManager.put("ComboBox.font", defaultFont);
+
             JFrame frame = new JFrame("Agent Behavior Demo");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            BehaviorRegistry registry = BehaviorRegistry.createDefault();
+            BehaviorRegistry registry = BehaviorRegistry.defaultRegistry();
             World world = World.createWorld(600, 400, registry);
             SimulationEngine engine = new SimulationEngine(world);
-            WorldPanel panel = new WorldPanel(world);
+            WorldPanel worldPanel = new WorldPanel(world);
             ControlPanel controlPanel = new ControlPanel(world, engine, registry);
             SwingSimulationLoop loop = new SwingSimulationLoop(engine, () -> {
                 controlPanel.updateSelection(world.getSelectedAgent());
                 controlPanel.updateStatus();
-                panel.repaint();
+                worldPanel.repaint();
             });
             world.saveInitialState();
             controlPanel.updateSelection(world.getSelectedAgent());
 
-            panel.setSelectionListener((x, y) -> {
+            worldPanel.setSelectionListener((x, y) -> {
                 world.selectAgentAt(x, y, 20);
                 controlPanel.updateSelection(world.getSelectedAgent());
-                panel.repaint();
+                worldPanel.repaint();
             });
 
             frame.setLayout(new BorderLayout());
-            frame.add(panel, BorderLayout.CENTER);
+            frame.add(worldPanel, BorderLayout.CENTER);
             frame.add(controlPanel, BorderLayout.EAST);
             frame.pack();
             frame.setLocationRelativeTo(null);

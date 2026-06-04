@@ -3,7 +3,6 @@ package agentdemo.model;
 import agentdemo.behavior.Behavior;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
 
 public class Agent {
     private double x;
@@ -14,8 +13,6 @@ public class Agent {
     private String name;
     private Behavior behavior;
     private Color color;
-    private double maxSpeed = 100.0;
-    private double acceleration = 170.0;
 
     public Agent(double x, double y, double vx, double vy, double radius, String name, Behavior behavior, Color color) {
         this.x = x;
@@ -65,7 +62,8 @@ public class Agent {
     // 限制速度
     public void limitSpeed() {
         double speed = Math.sqrt(vx * vx + vy * vy);
-        if (speed <= maxSpeed && speed > 1e-9) {
+        double maxSpeed = 100.0;
+        if (speed <= maxSpeed) {
             return;
         }
         vx = vx / speed * maxSpeed;
@@ -79,6 +77,7 @@ public class Agent {
             return;
         }
 
+        double acceleration = 170.0;
         vx += dirX / length * acceleration * strength * dt;
         vy += dirY / length * acceleration * strength * dt;
 
@@ -93,21 +92,6 @@ public class Agent {
     // 朝目标点加速
     public void accelerationTo(double targetX, double targetY, double strength, double dt) {
         accelerationToward(targetX - this.x, targetY - this.y, strength, dt);
-    }
-
-    public void draw(Graphics2D g, boolean selected) {
-        double size = 2 * radius;
-        if (selected) {
-            g.setColor(new Color(255, 190, 40, 120));
-            g.fill(new Ellipse2D.Double(x - radius - 5, y - radius - 5, size + 10, size + 10));
-        }
-        g.setColor(color);
-        g.fill(new Ellipse2D.Double(x - radius, y - radius, size, size));
-
-        g.setColor(Color.BLACK);
-        g.draw(new Ellipse2D.Double(x - radius, y - radius, size, size));
-        g.drawLine((int) x, (int) y, (int) (x + vx * 0.20), (int) (y + vy * 0.20));
-
     }
 
     // 和目标点距离
@@ -133,12 +117,17 @@ public class Agent {
     public double getRadius() { return radius; }
     public Color getColor() { return color; }
     public String getName() { return this.name; }
+    public String getBehaviorKey() {
+        return behavior == null ? "" : behavior.key();
+    }
     public Behavior getBehavior() { return this.behavior; }
 
     public void setRadius(double radius) { this.radius = radius; }
     public void setColor(Color color) { this.color = color; }
     public void setName(String name) { this.name = name; }
-    public void setBehavior(Behavior behavior) { this.behavior = behavior; }
+    public void setBehavior(Behavior behavior) {
+        this.behavior = behavior;
+    }
 
     public void setPosition(double x, double y) {
         this.x = x;

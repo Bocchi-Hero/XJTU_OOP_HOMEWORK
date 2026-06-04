@@ -10,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
 
 public class WorldPanel extends JPanel {
     private final World world;
@@ -52,18 +53,35 @@ public class WorldPanel extends JPanel {
         for (int y = 0; y < getHeight(); y += gridSize) {
             g2.drawLine(0, y, getWidth(), y);
         }
+    }
 
-        for (Agent a : world.getAgents()) {
-            a.draw(g2, a == world.getSelectedAgent());
+    private void drawAgent(Graphics2D g, Agent agent, boolean selected) {
+        double x = agent.getX();
+        double y = agent.getY();
+        double radius = agent.getRadius();
+        double vx = agent.getVx();
+        double vy = agent.getVy();
+        Color color = agent.getColor();
+        double size = 2 * radius;
+
+        if (selected) {
+            g.setColor(new Color(255, 190, 40, 120));
+            g.fill(new Ellipse2D.Double(x - radius - 5, y - radius - 5, size + 10, size + 10));
         }
+        g.setColor(color);
+        g.fill(new Ellipse2D.Double(x - radius, y - radius, size, size));
+
+        g.setColor(Color.BLACK);
+        g.draw(new Ellipse2D.Double(x - radius, y - radius, size, size));
+        g.drawLine((int) x, (int) y, (int) (x + vx * 0.20), (int) (y + vy * 0.20));
     }
 
     private void drawAgents(Graphics2D g2) {
         FontMetrics metrics = g2.getFontMetrics();
         for (Agent agent : world.getAgents()) {
             boolean selected = agent == world.getSelectedAgent();
-            agent.draw(g2, selected);
-            String label = agent.getName() + " - " + agent.getBehavior().name();
+            drawAgent(g2, agent, selected);
+            String label = agent.getName() + " - " + agent.getBehavior().displayName();
             int labelX = (int) (agent.getX() + agent.getRadius() + 5);
             int labelY = (int) (agent.getY() - agent.getRadius() - 4);
             g2.setColor(new Color(30, 34, 38));
